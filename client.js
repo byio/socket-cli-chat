@@ -81,3 +81,26 @@ function chat_command(cmd, arg) {
       console_out('Invalid command.');
   }
 }
+
+// Handle and Output Incoming Messages
+socket.on('message', data => {
+  let lead;
+  // if regular chat message from user
+  if (data.type == 'chat' && data.nickname == nickname) {
+    lead = color("<"+data.nick+"> ", "white+black_bg");
+    console_out(lead + data.message);
+    // if chat message from other users
+  } else if (data.type == 'chat' && data.nickname != nickname) {
+    lead = color("<"+data.nick+"> ", "green");
+    console_out(lead + data.message);
+    // if notice from app
+  } else if (data.type == 'notice') {
+    console_out(color(data.message), "red");
+    // if targeted msg to user
+  } else if (data.type == 'tell' && data.to == nickname) {
+    lead = color("["+data.from+"->"+data.to+"] ", "cyan");
+    console_out(lead + data.message);
+  } else if (data.type == 'emote') {
+    console_out(color(data.message), "blink");
+  }
+});
