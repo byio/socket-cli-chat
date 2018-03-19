@@ -21,3 +21,27 @@ rl.question('Please enter a username: ', (username) => {
   });
   rl.prompt(true);
 });
+
+// Console.log() workaround for rl.prompt()
+function console_out(msg) {
+  process.stdout.clearLine();
+  process.stdout.cursorTo(0);
+  console.log(msg);
+  rl.prompt(true);
+}
+
+// Handle Input ('line' event)
+rl.on('line', (line) => {
+  // check if input is meant to be a command (starts with /) or text
+  if (line[0] == "/" && line.length > 0) {
+    // separate the comand from the argument
+    const cmd = line.match(/[a-z]+\b/)[0];
+    const arg = line.substring(cmd.length + 2, line.length);
+    // invoke function to process command
+    chat_command(cmd, arg);
+  } else {
+    // send chat message
+    socket.emit('send', { type: 'chat', message: line, nickname});
+    rl.prompt(true);
+  }
+});
