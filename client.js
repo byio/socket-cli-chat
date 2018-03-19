@@ -45,3 +45,39 @@ rl.on('line', (line) => {
     rl.prompt(true);
   }
 });
+
+// Process Chat Command
+function chat_command(cmd, arg) {
+  switch (cmd) {
+    // change nickname
+    case 'nick':
+      const notice = `${nickname} changed their name to ${arg}.`
+      nickname = arg;
+      socket.emit('send', {
+        type: 'notice',
+        message: notice
+      });
+      break;
+    // targeted msg
+    case 'msg':
+      const to = arg.match(/[a-z]+\b/)[0];
+      const message = arg.substring(to.length, arg.length);
+      socket.emit('send', {
+        type: 'tell',
+        message,
+        to,
+        from: nickname
+      });
+      break;
+    // emote
+    case 'me':
+      const emote = `${nickame} ${arg}.`;
+      socket.emit('send', {
+        type: 'emote',
+        message: emote
+      });
+      break;
+    default:
+      console_out('Invalid command.');
+  }
+}
