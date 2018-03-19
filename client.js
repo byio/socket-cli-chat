@@ -1,11 +1,12 @@
 const readline = require('readline');
 const socketio = require('socket.io-client');
+const color = require('ansi-color').set;
 
 // Init Variables
 let nickname;
 
 // Setup Client Socket to Make Connection
-const socket = socketio.connect('localhost', {port: 2000});
+const socket = socketio('http://localhost:2000');
 
 // Create Readline Interface
 const rl = readline.createInterface(process.stdin, process.stdout);
@@ -71,7 +72,7 @@ function chat_command(cmd, arg) {
       break;
     // emote
     case 'me':
-      const emote = `${nickame} ${arg}.`;
+      const emote = `${nickname} ${arg}.`;
       socket.emit('send', {
         type: 'emote',
         message: emote
@@ -87,11 +88,11 @@ socket.on('message', data => {
   let lead;
   // if regular chat message from user
   if (data.type == 'chat' && data.nickname == nickname) {
-    lead = color("<"+data.nick+"> ", "white+black_bg");
+    lead = color("<"+data.nickname+"> ", "white+black_bg");
     console_out(lead + data.message);
     // if chat message from other users
   } else if (data.type == 'chat' && data.nickname != nickname) {
-    lead = color("<"+data.nick+"> ", "green");
+    lead = color("<"+data.nickname+"> ", "green");
     console_out(lead + data.message);
     // if notice from app
   } else if (data.type == 'notice') {
